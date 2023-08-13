@@ -10,6 +10,7 @@ from langchain.chains import ConversationalRetrievalChain
 from templates import css, bot_template, user_template
 from langchain.llms import HuggingFaceHub
 import openai
+openai_api_key = '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'
 
 def get_text_from_pdf(pdfs):
     ## empty string(variable) to store all the text:
@@ -84,8 +85,6 @@ def main():
     ## TO ACCESS THE API-TOKENS:
     ## This loads variables from your .env file into the environment
     load_dotenv()
-    openai_api_key = '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'
-    openai.api_key = openai_api_key
     st.set_page_config(
         page_title="Chatting with Multipe Pdf's",
         page_icon=":books:",
