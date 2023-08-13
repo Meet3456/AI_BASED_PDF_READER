@@ -10,7 +10,6 @@ from langchain.chains import ConversationalRetrievalChain
 from templates import css, bot_template, user_template
 from langchain.llms import HuggingFaceHub
 import openai
-openai_api_key = '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'
 
 def get_text_from_pdf(pdfs):
     ## empty string(variable) to store all the text:
