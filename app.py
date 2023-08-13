@@ -81,6 +81,7 @@ def handle_userinput(user_question):
 def main():
 
     ## TO ACCESS THE API-TOKENS:
+    ## This loads variables from your .env file into the environment
     load_dotenv()
 
     st.set_page_config(
