@@ -7,9 +7,24 @@ from langchain.vectorstores import FAISS
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
+from langchain.prompts import PromptTemplate
 from templates import css, bot_template, user_template
 from langchain.llms import HuggingFaceHub
 import openai
+from langchain.prompts import (
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    SystemMessagePromptTemplate,
+)
+
+system_message_prompt = SystemMessagePromptTemplate.from_template(
+"In want you to act as a law agent, understanding all laws and related jargon, and explaining them in a simpler and descriptive way. Return a list of all the related laws drafted for the user_input question and provide proper penal codes if applicable from the ingested PDF, and explain the process and terms in a simpler way. The context is:\n{context}"
+)
+human_message_prompt = HumanMessagePromptTemplate.from_template(
+    "{question}"
+)
+
+
 
 def get_text_from_pdf(pdfs):
     ## empty string(variable) to store all the text:
@@ -51,16 +66,29 @@ def store_vector_embeddings(get_text_chunks):
     return vectorstore
 
 
+
+
 def get_conversation_chain(vectorstore):
-    llm = ChatOpenAI()
-    memory = ConversationBufferMemory(memory_key='chat_history',return_messages=True)
+
+
+
+    llm = ChatOpenAI(temperature=0)
+
+    memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
     conversation_chain = ConversationalRetrievalChain.from_llm(
         llm=llm,
-        ## STORING THE EMBEDDINGS AS VECTOR
-        retriever = vectorstore.as_retriever(),
-        ## CREATING A BUFFER MEMORY
-        memory = memory
+        retriever=vectorstore.as_retriever(),
+        memory=memory,
+    combine_docs_chain_kwargs={
+        "prompt": ChatPromptTemplate.from_messages([
+            system_message_prompt,
+            human_message_prompt,
+        ]),
+    },
     )
+
+    return conversation_chain
+
 
 
     return conversation_chain
@@ -99,8 +127,8 @@ def main():
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = None
 
-    st.header("Start Chatting with your PDFs :books:")
-    user_question = st.text_input(":blue[Ask any Questions about your Uploaded Documents:]")
+    st.header("NYAYMITRA - ASK ME ANY LAW RELATED QUERY")
+    user_question = st.text_input(":blue[Ask any Questions about Any Laws or Related jargons or Human Rights]")
 
     if user_question:
         handle_userinput(user_question)
